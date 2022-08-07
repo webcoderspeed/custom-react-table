@@ -9,7 +9,6 @@ import {
   HeaderCell,
   Row,
 } from './Table.Elements';
-import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 
 interface IColumn {
   title: string;
@@ -40,49 +39,59 @@ interface IExpandable {
   expandRowByClick?: boolean;
 }
 
+interface IStyle {
+  table?: React.CSSProperties;
+  header?: React.CSSProperties;
+  body?: React.CSSProperties;
+  row?: React.CSSProperties;
+  cell?: React.CSSProperties;
+  expandedCell?: React.CSSProperties;
+}
+
 interface ITableProps {
   columns: IColumn[];
   data: any[];
   expandable?: IExpandable;
+  styles?: IStyle;
 }
 
-const Table = ({ columns, data, expandable }: ITableProps) => {
+const Table = ({ columns, data, expandable, styles }: ITableProps) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]);
 
-  const onExpand = useCallback(
-    (expanded: boolean, record: any) => {
-      if (expanded) {
-        setExpandedRowKeys([...expandedRowKeys, record.key]);
-      } else {
-        setExpandedRowKeys(expandedRowKeys.filter((key) => key !== record.key));
-      }
-    },
-    []
-  );
+  const onExpand = useCallback((expanded: boolean, record: any) => {
+    if (expanded) {
+      setExpandedRowKeys([...expandedRowKeys, record.key]);
+    } else {
+      setExpandedRowKeys(expandedRowKeys.filter((key) => key !== record.key));
+    }
+  }, []);
 
   // render expandable row
-  const renderExpandableRow = (record: any) => {
+  const renderExpandableRow = useCallback((record: any) => {
     if (expandable && expandable.expandedRowRender) {
       return expandable.expandedRowRender(record);
     }
     return null;
-  };
+  }, []);
 
   // render expandable row icon
-  const renderExpandableIcon = ({
-    expanded,
-    onExpand,
-    record,
-  }: {
-    expanded: boolean;
-    onExpand: (expanded: boolean, record: any) => void;
-    record: any;
-  }) => {
-    if (expandable && expandable.expandIcon) {
-      return expandable.expandIcon({ expanded, onExpand, record });
-    }
-    return null;
-  };
+  const renderExpandableIcon = useCallback(
+    ({
+      expanded,
+      onExpand,
+      record,
+    }: {
+      expanded: boolean;
+      onExpand: (expanded: boolean, record: any) => void;
+      record: any;
+    }) => {
+      if (expandable && expandable.expandIcon) {
+        return expandable.expandIcon({ expanded, onExpand, record });
+      }
+      return null;
+    },
+    []
+  );
 
   const renderHeader = useCallback((column: IColumn) => {
     if (column.render) {
@@ -98,16 +107,31 @@ const Table = ({ columns, data, expandable }: ITableProps) => {
     return record[column.key];
   }, []);
 
+  useEffect(() => {
+    if (expandable && expandable.expandedRowKeys) {
+      setExpandedRowKeys(expandable.expandedRowKeys);
+    }
+  }, [expandable]);
+
   return (
-    <Container>
-      <Header columns={columns.length}>
+    <Container
+      style={styles?.table ?? {}}
+    >
+      <Header columns={columns.length}
+        style={styles?.header ?? {}}
+      >
         {columns.map((column) => (
           <HeaderCell key={column.key}>{column.title}</HeaderCell>
         ))}
       </Header>
-      <Body>
+      <Body
+        style={styles?.body ?? {}}
+      >
         {data.map((record) => (
-          <Row key={record.key} columns={columns.length}>
+          <Row key={record.key} columns={columns.length}
+          isActive={expandedRowKeys.includes(record.key)}
+            style={styles?.row ?? {}}
+          >
             {columns.map(({ key, render }, index) => {
               if (expandable && index === 0) {
                 return (

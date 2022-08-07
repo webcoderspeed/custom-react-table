@@ -127,15 +127,6 @@ const App = () => {
       title: 'Strategy',
       dataIndex: 'strategy',
       key: 'strategy',
-      render: (text: string, record: any) => (
-        <div
-          style={{
-            backgroundColor: '#f5f5f5',
-          }}
-        >
-          {text}
-        </div>
-      ),
     },
     {
       title: 'Returns',
@@ -178,6 +169,30 @@ const App = () => {
         <Table
           columns={trade_column}
           data={[
+            {
+              key: '1',
+              trade_instrument_symbol: 'AAPL',
+              trade_returns: '+0.5%',
+              action: 'Buy',
+            },
+            {
+              key: '2',
+              trade_instrument_symbol: 'MSFT',
+              trade_returns: '+0.5%',
+              action: 'Buy',
+            },
+            {
+              key: '1',
+              trade_instrument_symbol: 'AAPL',
+              trade_returns: '+0.5%',
+              action: 'Buy',
+            },
+            {
+              key: '2',
+              trade_instrument_symbol: 'MSFT',
+              trade_returns: '+0.5%',
+              action: 'Buy',
+            },
             {
               key: '1',
               trade_instrument_symbol: 'AAPL',
@@ -246,7 +261,9 @@ const App = () => {
   const [activeKey, setActiveKey] = useState('');
 
   return (
-    <>
+    <div style={{
+      padding: '20px',
+    }}>
       <Table
         columns={column}
         data={data}
@@ -273,7 +290,7 @@ const App = () => {
           expandedRowKeys: [activeKey],
         }}
       />
-    </>
+    </div>
   );
 };
 
